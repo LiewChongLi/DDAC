@@ -20,6 +20,13 @@ namespace DDAC.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public DbSet<ShipDetails> ShipDetails { get; set; }
+        public DbSet<Location> Location { get; set; }
+        public DbSet<ScheduleDetails> ScheduleDetails { get; set; }
+        public DbSet<CustomerModels> CustomerModels { get; set; }
+        public DbSet<ContainerModels> ContainerModels { get; set; }
+
+        public DbSet<BookScheduleModel> BookScheduleModels { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
