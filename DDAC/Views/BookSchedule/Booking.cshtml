@@ -1,0 +1,187 @@
+﻿@model DDAC.ViewModels.BookScheduleViewModel
+@{
+    ViewBag.Title = "Booking";
+}
+
+<style>
+
+    #sortable {
+        margin-top: 10px;
+    }
+
+    li.ui-state-default {
+        margin-top: 5px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    li.ui-state-default:last-child {
+        border-bottom: none;
+    }
+
+</style>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+
+
+@if (ViewBag.IsSuccess != null)
+{
+    if (ViewBag.IsSuccess)
+    {
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @ViewBag.Message @Html.ActionLink("Booked Schedule Overview", "Index", new { }, new { @class = "alert-link" })
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @ViewBag.Message
+        </div>
+    }
+}
+
+
+<h2>Booking</h2>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.StartDate)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.StartDate)
+    </div>
+</div>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.EndDate)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.EndDate)
+    </div>
+</div>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.Origin)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.Origin)
+    </div>
+</div>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.Destination)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.Destination)
+    </div>
+</div>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.ShipDetails.ShipName)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.ShipDetails.ShipName)
+    </div>
+</div>
+
+<div class="panel panel-info col-md-4">
+    <div class="panel-heading">
+        @Html.DisplayNameFor(b => b.ScheduleDetails.ShipDetails.RemainingBaySize)
+    </div>
+    <div class="panel-body">
+        @Html.DisplayFor(b => b.ScheduleDetails.ShipDetails.RemainingBaySize)
+    </div>
+</div>
+
+@using (Html.BeginForm("CreateBooking", "BookSchedule", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <ul id="sortable" class="list-unstyled"></ul>
+    <div>
+        @Html.HiddenFor(b => b.ScheduleDetails.ShipDetails.RemainingBaySize, new { @id = "Remaining" })
+        @Html.HiddenFor(b => b.ScheduleDetails.Id, new { @id = "ID" })
+        @Html.HiddenFor(b => b.ScheduleDetails.Origin)
+        @Html.HiddenFor(b => b.ScheduleDetails.Destination)
+        @Html.HiddenFor(b => b.ScheduleDetails.EndDate)
+        @Html.HiddenFor(b => b.ScheduleDetails.StartDate)
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(false, "", new {@class = "text-danger"})
+
+        <div class="row form-group">
+            <div class="col-md-7">
+                @Html.DropDownListFor(b => b.BookScheduleModels.CustomerModelsId, new SelectList(Model.CustomerModels, "Id", "CustomerName"), new {@class = "form-control", placeholder = "Customer Name"})
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <div class="col-md-7">
+                @Html.TextBoxFor(b => b.Container.ContainerType, new {@class = "form-control", placeholder = "Container Type", id = "ContainerType"})
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <div class="col-md-7">
+                @Html.TextBoxFor(b => b.Container.NumberOfBayUsed, new {@class = "form-control", placeholder = "Number of Bay Used", @id = "BayNumber"})
+            </div>
+        </div>
+
+        <input id="addcontainerbtn" type="button" value="Add Container Type" class="btn btn-default"/>
+
+        <input id="bookingbtn" type="submit" value="Book" class="btn btn-success"/>
+        
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    
+    <script>
+        $(document).ready(function() {
+            document.getElementById("bookingbtn").disabled = true;
+        });
+   
+        $('#addcontainerbtn').on('click',
+            function(e) {
+                e.preventDefault();
+                alert($('#Remaining').val());
+                var containertype = $('#ContainerType').val();
+                var baynumber = $('#BayNumber').val();
+                var remaining = $('#Remaining').val();
+                var sid = $('#ID').val();
+
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("AddContainer","BookSchedule")',
+                    data: {
+                        id: sid,
+                        remain: remaining,
+                        container: containertype,
+                        bay: baynumber
+                    },
+                    success: function (test) {
+                        if (test.message != null) {
+                            alert(test.message);
+                        }                       
+                        if (test.success) {
+                            createList(containertype, baynumber);
+                            document.getElementById("bookingbtn").disabled = false;
+                        }
+
+                        
+                    }
+                });
+
+            });
+
+        function createList(containertype, baynumber) {
+            var markup = '<li class="ui-state-default"><label>Container Type: ' + containertype + ' with number of bay: '+ baynumber +'</label></li>';
+            $('#sortable').append(markup);
+        }
+    </script>
+}

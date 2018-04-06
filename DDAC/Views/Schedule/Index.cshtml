@@ -1,0 +1,69 @@
+﻿@model List<DDAC.Models.ScheduleDetails>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    #addschedulebtn {
+        margin-bottom: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid white;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+</style>
+
+<div class="container-fluid ">
+
+    <h2>Schedule Overview</h2>
+    <br />
+    <button id="addschedulebtn" class="btn btn-success btn-lg" type="button" onclick="location.href='@Url.Action("AddSchedule","Schedule")'">Add Schedule</button>
+    <table id="schedule" style="width: 100%">
+
+        <tr>
+            <th>Departure Date & Time</th>
+            <th>Arrival Date & Time</th>
+            <th>Ship Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Action</th>
+        </tr>
+
+        @{
+            foreach (var i in Model)
+            {
+                <tr>
+                    <td>@i.StartDate</td>
+                    <td>@i.EndDate</td>
+                    <td>@i.ShipDetails.ShipName</td>
+                    <td>@i.Origin</td>
+                    <td>@i.Destination</td>
+                    <td>
+                        <span class="label label-warning">@Html.ActionLink("Edit", "EditSchedule", new { id = i.Id })</span>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#schedule').DataTable();
+        });
+    </script>
+
+}
+
+
+

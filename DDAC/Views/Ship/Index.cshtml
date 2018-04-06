@@ -1,0 +1,126 @@
+﻿@model List<DDAC.Models.ShipDetails>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    #addshipbtn {
+        margin-bottom: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid white;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+
+    .alert {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+    }
+
+        .alert.success {
+            background-color: #4CAF50;
+        }
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .closebtn:hover {
+            color: black;
+        }
+</style>
+
+@if (TempData["delete"] != null)
+{
+    <div class="alert-success">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong>@TempData["delete"].ToString()</strong>
+    </div>
+}
+@if (TempData["delete-not-success"] != null)
+{
+    <div class="alert">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong>@TempData["delete-not-success"].ToString()</strong>
+    </div>
+}
+
+<div class="container-fluid ">
+
+    <h2>Ship Overview</h2>
+    <br />
+    <button id="addshipbtn" class="btn btn-success btn-lg" type="button" onclick="location.href='@Url.Action("AddShip","Ship")'">Add Ship</button>
+    <table id="ship" style="width: 100%">
+
+        <tr>
+            <th>Ship Name</th>
+            <th>Bay Size</th>
+            <th>Remaining Bay Size</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Action</th>
+        </tr>
+
+        @{
+            foreach (var i in Model)
+            {
+                <tr>
+                    <td>@i.ShipName</td>
+                    <td>@i.BaySize</td>
+                    <td>@i.RemainingBaySize</td>
+                    <td>@i.Origin</td>
+                    <td>@i.Destination</td>
+                    <td>
+                        <span class="label label-danger"><button data-shipid="@i.Id" class="btn-link delete">Delete</button></span>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+
+</div>
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+
+            //var table = $('#ship').DataTable();
+
+            $("#ship .label .delete").on("click",
+                function () {
+                    var button = $(this);
+                    if (confirm("Are you sure you want to delete this ship?")) {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("DeleteShip", "Ship")',
+                            data: { id: $(this).attr("data-shipid") },
+                            success: function() {
+                                ///table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+
+                });
+        });
+
+    </script>
+}
+
+

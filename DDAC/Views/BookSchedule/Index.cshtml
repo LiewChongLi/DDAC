@@ -1,0 +1,69 @@
+﻿@model IEnumerable<DDAC.Models.BookScheduleModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    #bookbtn {
+        margin-bottom: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid white;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <h2>Booked Schedule</h2>
+    <br />
+    @if (!User.IsInRole("Admin"))
+    {
+        <button id="bookbtn" class="btn btn-success btn-lg" type="button" onclick="location.href='@Url.Action("ViewSchedule","BookSchedule")'">Book Schedule</button>
+
+    }
+    <table id="booking" style="width: 100%">
+
+        <tr>
+            <th>Booking ID</th>
+            <th>Customer Name</th>
+            <th>Customer Phone Number</th>
+            <th>Departure Date</th>
+            <th>Arrival Date</th>
+            <th>Ship Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Number of Bay Used</th>
+        </tr>
+
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Id</td>
+                <td>@book.CustomerModels.CustomerName</td>
+                <td>@book.CustomerModels.PhoneNumber</td>
+                <td>@book.ScheduleDetails.StartDate</td>
+                <td>@book.ScheduleDetails.EndDate</td>
+                <td>@book.ScheduleDetails.ShipDetails.ShipName</td>
+                <td>@book.ScheduleDetails.Origin</td>
+                <td>@book.ScheduleDetails.Destination</td>
+                <td>@book.totalBayUsed</td>
+            </tr>
+        }
+
+    </table>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#booking').DataTable();
+        });
+    </script>
+
+}

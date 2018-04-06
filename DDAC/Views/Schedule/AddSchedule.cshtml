@@ -1,0 +1,228 @@
+﻿@model DDAC.ViewModels.AddScheduleViewModel
+
+@{
+    if (ViewBag.Name == "Edit")
+    {
+        ViewBag.Title = "EditSchedule";
+    }
+    else
+    {
+        ViewBag.Title = "AddSchedule";
+    }
+
+    ViewBag.Action = ViewBag.Name == "Edit" ? "Edit" : "CreateSchedule";
+}
+
+<style>
+    #existing {
+        margin-top: 20px;
+    }
+    #tb #tr {
+        border-bottom: 1px solid white;
+        border-collapse: collapse;
+    }
+
+</style>
+
+<head>
+    <script type="text/javascript" src="/Scripts/bootstrap-datetimepicker.js"></script>
+    <link rel="stylesheet" href="/Content/bootstrap-datetimepicker.css"/>
+</head>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@if (ViewBag.IsSuccess != null)
+{
+    if (ViewBag.IsSuccess)
+    {
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @ViewBag.Message @Html.ActionLink("Schedule Overview", "Index", new { }, new { @class = "alert-link" })
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @ViewBag.Message
+        </div>
+    }
+}
+
+@if (ViewBag.Name != null)
+{
+    if (ViewBag.Name == "Edit")
+    {
+        
+        <div class="panel panel-default" id="existing">
+            <div class="panel-body">
+                <table style="width: 100%" id="tb">
+                
+                    <tr id="tr">
+                        <th>Departure Date & Time</th>
+                        <th>Arrival Date & Time</th>
+                        <th>Ship Name</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DisplayNameFor(s => s.ScheduleDetails.StartDate)
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(s => s.ScheduleDetails.EndDate)
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(s => s.ScheduleDetails.Origin)
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(s => s.ScheduleDetails.Destination)
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(s => s.ScheduleDetails.ShipDetails.ShipName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(s => s.ScheduleDetails.StartDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(s => s.ScheduleDetails.EndDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(s => s.ScheduleDetails.Origin)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(s => s.ScheduleDetails.Destination)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(s => s.ScheduleDetails.ShipDetails.ShipName)
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    }
+}
+
+
+    @using (Html.BeginForm((string)ViewBag.Action, "Schedule", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <div>
+            <h2>Create Schedule</h2>
+            @Html.HiddenFor(s =>s.ScheduleDetails.Id)
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+            <div class="row form-group">
+                <div class="col-md-7">
+                    @Html.TextBoxFor(s => s.ScheduleDetails.StartDate, new { id = "departureDateTimePicker", @class = "form-control", placeholder = "Departure Date and Time" })
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-7">
+                    @Html.TextBoxFor(s => s.ScheduleDetails.EndDate, new { id = "arrivalDateTimePicker", @class = "form-control", placeholder = "Arrival Date and Time" })
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-7">
+                    @Html.DropDownListFor(s => s.ScheduleDetails.Origin, new SelectList(Model.Locations, "Origin", "Origin"), "-- From --", new { @class = "form-control", @onchange = "FindDestination()", @id = "schedule_origin" })
+
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-7">
+                    @Html.DropDownListFor(s => s.ScheduleDetails.Destination, new SelectList(Enumerable.Empty<SelectListItem>(), "Destination", "Destination"), "-- To --", new { @class = "form-control", @onchange = "FindShip()", @id = "schedule_destination" })
+
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-7">
+                    @Html.DropDownListFor(s => s.ScheduleDetails.ShipDetailsId, new SelectList(Enumerable.Empty<SelectListItem>(), "Id", "ShipName"), "-- Pick Ship --", new { @class = "form-control", @id = "pick_ship" })
+
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-7">
+                    <input id="createschedulebtn" type="submit" , class="btn btn-success" value="Create" />
+                </div>
+            </div>
+        </div>
+    }
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    
+    <script>
+
+        $(function () {
+            $("#departureDateTimePicker").datetimepicker({
+                minDate: new Date()
+               
+
+            });
+            $('#arrivalDateTimePicker').datetimepicker({
+                
+                useCurrent: false   //Important! See issue #1075
+
+            });
+
+            $("#departureDateTimePicker").on("dp.change",
+                function (e) {
+                    $('#arrivalDateTimePicker').data("DateTimePicker").minDate(e.date);
+                });
+            $("#arrivalDateTimePicker").on("dp.change",
+                function (e) {
+                    $('#departureDateTimePicker').data("DateTimePicker").maxDate(e.date);
+                });
+        });
+
+        function FindDestination() {
+            var origin = $('#schedule_origin :selected').text();
+            $.ajax({
+                url: '@Url.Action("FindDestination")',
+                type: "GET",
+                dataType: "JSON",
+                data: { origin: origin },
+                success: function (destination) {
+                    $("#schedule_destination").html("").append(
+                        $('<option></option>').val('').html("-- To --")); // clear before appending new list
+                    $.each(destination, function (i, des) {
+                        $("#schedule_destination").append(
+                            $('<option></option>').val(des.Destination).html(des.Destination));
+                    });
+                }
+            });
+        }
+
+        function FindShip() {
+            var origin = $('#schedule_origin :selected').text();
+            var destination = $('#schedule_destination :selected').text();
+            $.ajax({
+                url: '@Url.Action("FindShip")',
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    origin: origin,
+                    destination: destination
+                },
+                success: function (schedules) {
+                    $("#pick_ship").html("").append(
+                        $('<option></option>').val('').html("-- Pick Ship --")); // clear before appending new list
+                    $.each(schedules, function (i, ship) {
+                        $("#pick_ship").append(
+                            $('<option></option>').val(ship.Id).html(ship.ShipName));
+                    });
+                }
+            });
+        }
+    </script>
+
+}
