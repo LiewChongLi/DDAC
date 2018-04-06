@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDAC", "DDAC\DDAC.csproj", "{95D1C977-6697-4090-B06D-F03DD0F112FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95D1C977-6697-4090-B06D-F03DD0F112FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95D1C977-6697-4090-B06D-F03DD0F112FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95D1C977-6697-4090-B06D-F03DD0F112FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95D1C977-6697-4090-B06D-F03DD0F112FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1B0BE327-4B8E-4988-B66E-59A4DEF2F812}
+	EndGlobalSection
+EndGlobal
